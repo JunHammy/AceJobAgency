@@ -1,0 +1,96 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header text-center bg-primary text-white">
+                    <h4>Login</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="form-group mb-3">
+                            <label for="Email" class="form-label">Email</label>
+                            <input type="email" id="Email" name="Email" class="form-control" required />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="Password" class="form-label">Password</label>
+                            <input type="password" id="Password" name="Password" class="form-control" required />
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <a href="/Register" class="small text-muted">Create an account</a>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+
+                    @if (Model.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger mt-3">
+                            @Model.ErrorMessage
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.google.com/recaptcha/api.js?render=6Lcei9IqAAAAAIMjTNSSKnSWlPhJnqYO1otoXfej" async defer></script>
+
+<script>
+    document.querySelector("form").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        grecaptcha.execute('6Lcei9IqAAAAAIMjTNSSKnSWlPhJnqYO1otoXfej', { action: 'login' })
+            .then(function(token) {
+                if (!token) {
+                    alert("reCAPTCHA verification failed. Please try again.");
+                    return;
+                }
+
+                var input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "RecaptchaResponse";
+                input.value = token;
+                document.querySelector("form").appendChild(input);
+
+                document.querySelector("form").submit();
+            })
+            .catch(function(error) {
+                console.error("Error during reCAPTCHA execution:", error);
+                alert("There was an error with the reCAPTCHA verification. Please try again.");
+            });
+    });
+</script>
+
+<style>
+    .form-label {
+        font-weight: 500;
+    }
+    .btn-primary {
+        font-size: 1.1rem;
+    }
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    .card-body {
+        padding: 2rem;
+    }
+    .alert {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+</style>

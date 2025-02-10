@@ -1,0 +1,262 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<script>
+    function checkPasswordStrength() {
+        var password = document.getElementById("password").value;
+        var feedback = document.getElementById("password-strength-feedback");
+        var strength = 0;
+
+        if (password.length >= 12) {
+            strength++;
+        }
+
+        // Check for uppercase letters
+        if (/[A-Z]/.test(password)) {
+            strength++;
+        }
+        // Check for lowercase letters
+        if (/[a-z]/.test(password)) {
+            strength++;
+        }
+        // Check for digits
+        if (/\d/.test(password)) {
+            strength++;
+        }
+        // Check for special characters
+        if (/[@@$!%*?&]/.test(password)) {
+            strength++;
+        }
+
+        // If the password is shorter than 12 characters, cap the strength at 1
+        if (password.length < 12) {
+            strength = Math.min(strength, 1);
+        }
+
+        // Cap the maximum strength to 4 (to match the highest index in our messages array)
+        strength = Math.min(strength, 4);
+
+        var messages = ["Very Weak", "Weak", "Moderate", "Strong", "Very Strong"];
+        var colors = ["red", "orange", "grey", "blue", "green"];
+
+        feedback.textContent = messages[strength];
+        feedback.style.color = colors[strength];
+    }
+
+    function togglePasswordVisibility(inputId) {
+        var inputField = document.getElementById(inputId);
+        var eyeIcon = document.getElementById(inputId + '-icon');
+
+        if (inputField.type === "password") {
+            inputField.type = "text";
+            eyeIcon.classList.remove("bi-eye-slash");
+            eyeIcon.classList.add("bi-eye");
+        } else {
+            inputField.type = "password";
+            eyeIcon.classList.remove("bi-eye");
+            eyeIcon.classList.add("bi-eye-slash");
+        }
+    }
+
+    function validateName(fieldName) {
+        var nameInput = document.getElementById("Register_" + fieldName);
+        var feedback = document.getElementById(fieldName + "-feedback");
+        var nameValue = nameInput.value;
+
+        // Regex to check if the name contains only letters (a-z, A-Z)
+        var invalidNamePattern = /[^a-zA-Z]/;
+
+        if (invalidNamePattern.test(nameValue)) {
+            feedback.textContent = "Name can only contain letters (no spaces, special characters or numbers).";
+        } else {
+            feedback.textContent = "";
+        }
+    }
+</script>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Register</h4>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @Model.ErrorMessage
+                        </div>
+                    }
+
+                    <form method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Register.FirstName" class="form-label">First Name</label>
+                            <input asp-for="Register.FirstName" class="form-control" onblur="validateName('FirstName')" id="Register_FirstName" />
+                            <span id="FirstName-feedback" class="text-danger"></span>
+                            <span asp-validation-for="Register.FirstName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Register.LastName" class="form-label">Last Name</label>
+                            <input asp-for="Register.LastName" class="form-control" onblur="validateName('LastName')" id="Register_LastName" />
+                            <span id="LastName-feedback" class="text-danger"></span>
+                            <span asp-validation-for="Register.LastName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Register.Gender" class="form-label">Gender</label>
+                            <select asp-for="Register.Gender" class="form-control">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="Register.Gender" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Register.NRIC" class="form-label">NRIC</label>
+                            <input asp-for="Register.NRIC" class="form-control" />
+                            <span asp-validation-for="Register.NRIC" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Register.Email" class="form-label">Email</label>
+                            <input asp-for="Register.Email" class="form-control" />
+                            <span asp-validation-for="Register.Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Register.Password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input asp-for="Register.Password" type="password" class="form-control" id="password" onkeyup="checkPasswordStrength()" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('password')" id="password-eye">
+                                    <i id="password-eye-icon" class="bi bi-eye-slash"></i>
+                                </button>
+                            </div>
+                            <div>
+                                <small id="password-strength-feedback" class="form-text"></small>
+                            </div>
+                            <div>
+                                <span asp-validation-for="Register.Password" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Register.ConfirmPassword" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <input asp-for="Register.ConfirmPassword" type="password" class="form-control" id="confirmPassword" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('confirmPassword')" id="confirmPassword-eye">
+                                    <i id="confirmPassword-eye-icon" class="bi bi-eye-slash"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Register.ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Register.DateOfBirth" class="form-label">Date of Birth</label>
+                            <input asp-for="Register.DateOfBirth" type="date" class="form-control" />
+                            <span asp-validation-for="Register.DateOfBirth" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Register.Resume" class="form-label">Resume</label>
+                            <input asp-for="Register.Resume" type="file" class="form-control-file" />
+                            <div>
+                                <span asp-validation-for="Register.Resume" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Register.WhoAmI" class="form-label">About You</label>
+                            <textarea asp-for="Register.WhoAmI" class="form-control"></textarea>
+                            <span asp-validation-for="Register.WhoAmI" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-center mt-4">
+                            <button type="submit" class="btn btn-primary w-100">Register</button>
+                        </div>
+                    </form>
+
+                    <br />
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <a href="/Register" class="small text-muted">Log in to your account</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.google.com/recaptcha/api.js?render=6Lcei9IqAAAAAIMjTNSSKnSWlPhJnqYO1otoXfej" async defer></script>
+
+<script>
+    document.querySelector("form").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        grecaptcha.execute('6Lcei9IqAAAAAIMjTNSSKnSWlPhJnqYO1otoXfej', { action: 'login' })
+            .then(function (token) {
+                if (!token) {
+                    alert("reCAPTCHA verification failed. Please try again.");
+                    return;
+                }
+
+                var input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "RecaptchaResponse";
+                input.value = token;
+                document.querySelector("form").appendChild(input);
+
+                document.querySelector("form").submit();
+            })
+            .catch(function (error) {
+                console.error("Error during reCAPTCHA execution:", error);
+                alert("There was an error with the reCAPTCHA verification. Please try again.");
+            });
+    });
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .form-label {
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        font-size: 1.1rem;
+    }
+
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .alert {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+
+    small.form-text {
+        font-size: 0.875rem;
+    }
+</style>
